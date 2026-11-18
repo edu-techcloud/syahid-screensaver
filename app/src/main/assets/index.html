@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Screensaver TV</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Aref+Ruqaa:wght@400;700&family=Amiri:wght@400;700&display=swap">
+<style>
+:root{--ink:#fff;--ink2:rgba(255,255,255,.78);--glass:rgba(8,24,40,.36);--edge:rgba(255,255,255,.22);--gold:#ffe7a8;
+  --ar:"Aref Ruqaa","Amiri","Noto Naskh Arabic","Droid Arabic Naskh","Scheherazade New","Traditional Arabic",serif}
+[data-phase=dawn]{--m1:#7a6a9c;--m2:#51457a;--m3:#2e2a50;--mq:#1f1c38;--sun:#ffd29a;--cl:#ffd6c0;--clo:.45}
+[data-phase=day]{--m1:#6aaed0;--m2:#34906c;--m3:#1f6b4f;--mq:#f3f1e4;--sun:#fff6c8;--cl:#ffffff;--clo:.7}
+[data-phase=dusk]{--m1:#9a4f80;--m2:#5f325e;--m3:#2f1b3c;--mq:#201232;--sun:#ffb36b;--cl:#ffb89a;--clo:.5}
+[data-phase=night]{--m1:#124050;--m2:#0b2c3a;--m3:#061b26;--mq:#04121a;--sun:#ffb36b;--cl:#5a7a96;--clo:.22}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:calc(100vw/80)}
+body{width:100vw;height:100vh;overflow:hidden;background:#020812;color:var(--ink);
+  font-family:"Caveat","Segoe Print","Bradley Hand","Comic Sans MS",cursive;cursor:none}
+
+/* Latar */
+.bg{position:fixed;inset:0;overflow:hidden}
+.sky{position:absolute;inset:0;opacity:0;transition:opacity 4s}
+[data-phase=dawn] .s-dawn,[data-phase=day] .s-day,[data-phase=dusk] .s-dusk,[data-phase=night] .s-night{opacity:1}
+.s-dawn{background:linear-gradient(#2b2a5e,#7a5aa6 40%,#ff9a76 75%,#ffd29a)}
+.s-day{background:linear-gradient(#1c7fd1,#5bb6f0 55%,#c4ecff)}
+.s-dusk{background:linear-gradient(#2a1f55,#9b3f7a 45%,#ff6f4a 78%,#ffb36b)}
+.s-night{background:linear-gradient(#020812,#06223a 60%,#0e4a52)}
+.scene{position:absolute;inset:0;width:100%;height:100%}
+.scene *{transition:fill 4s,opacity 4s,transform 4s}
+#sun,#moon,#stars,#lit{opacity:0}
+[data-phase=dawn] #sun{opacity:1;transform:translate(850px,730px)}
+[data-phase=day] #sun{opacity:1;transform:translate(960px,590px)}
+[data-phase=dusk] #sun{opacity:1;transform:translate(1080px,730px)}
+[data-phase=night] #sun{transform:translate(960px,1000px)}
+#moon{transform:translate(960px,640px)}
+[data-phase=night] #moon{opacity:1;transform:translate(960px,590px)}
+[data-phase=night] #stars,[data-phase=night] #lit{opacity:1}
+.sunc{fill:var(--sun)}.cl{fill:var(--cl);opacity:var(--clo)}
+.m1{fill:var(--m1)}.m2{fill:var(--m2)}.m3{fill:var(--m3)}.mq{fill:var(--mq)}
+
+/* Susun atur */
+.stage{position:relative;height:100%;padding:.5rem 2.6rem 1rem;display:grid;gap:.8rem;
+  grid-template-columns:1fr 19rem 1fr;grid-template-rows:auto auto auto 1fr}
+.glass{background:var(--glass);border:1px solid var(--edge);border-radius:1.4rem;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 .5rem 1.6rem rgba(0,0,0,.18);padding:.8rem 1.4rem;min-width:0}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.glass{background:rgba(10,24,40,.7)}}
+
+.bis{grid-column:1 / span 3;text-align:center;font-family:var(--ar);font-size:2.7rem;line-height:1.2;color:var(--gold);
+  text-shadow:0 0 1.2rem rgba(255,226,160,.55),0 .1rem .3rem rgba(0,0,0,.5)}
+
+.clock{grid-column:1;display:flex;flex-direction:column;justify-content:center}
+.time{font-size:5.2rem;font-weight:200;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.time small{font-size:1.7rem;font-weight:300;color:var(--ink2);letter-spacing:0;margin-left:.5rem}
+.date{font-size:1.4rem;font-weight:500;margin-top:.45rem}
+.hijri{font-size:1.05rem;color:var(--ink2);margin-top:.1rem;min-height:1.3rem}
+
+.weather{grid-column:2 / span 2;display:grid;grid-template-columns:auto 1fr;gap:1.4rem;align-items:center}
+.now .ic{font-size:2.8rem;line-height:1}
+.now .t{font-size:3.3rem;font-weight:200;line-height:1}
+.now .ds{font-size:1rem;color:var(--ink2);line-height:1.35}
+.right{display:flex;flex-direction:column;gap:.7rem;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{background:rgba(255,255,255,.14);border-radius:.7rem;padding:.25rem .7rem;font-size:.95rem;white-space:nowrap}
+.chip span{color:var(--ink2)}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem}
+.day{text-align:center;background:rgba(255,255,255,.1);border-radius:.9rem;padding:.4rem .1rem;font-size:.95rem}
+.day .dn{font-weight:600}
+.day .di{font-size:1.5rem;margin:.05rem 0}
+.day .dr{color:var(--ink2);font-size:.85rem}
+
+.prayer{grid-column:1 / span 3;position:relative;display:flex;align-items:center;gap:1.6rem;padding:.5rem 1.6rem 1.1rem}
+.next{min-width:18rem}
+.next .lbl{font-size:.95rem;color:var(--ink2)}
+.next .nm{font-size:1.9rem;font-weight:600;line-height:1.15}
+.next .cd{font-size:1.3rem;font-variant-numeric:tabular-nums;font-weight:300;color:var(--ink2)}
+.rows{flex:1;display:flex;gap:.5rem}
+.row{flex:1;display:flex;flex-direction:column;align-items:center;gap:0;padding:.3rem .2rem;border-radius:1rem;font-size:1.1rem}
+.row b{font-size:1.4rem;font-weight:400;font-variant-numeric:tabular-nums}
+.row.on{background:rgba(255,255,255,.26);box-shadow:inset 0 1px 0 rgba(255,255,255,.45);font-weight:600}
+.row.past{opacity:.55}
+.src{position:absolute;right:1.6rem;bottom:.35rem;font-size:.8rem;color:var(--ink2)}
+.live{font-size:.85rem;color:var(--ink2)}
+.live i{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#5dd68a;margin-right:.4rem}
+.live.off i{background:#ff8a6a}
+
+/* Hadis */
+.hadith{grid-column:1;grid-row:4;display:flex;flex-direction:column;overflow:hidden;align-self:start;height:100%}
+.hl{display:flex;justify-content:space-between;font-size:.9rem;color:var(--ink2)}
+.fade{transition:opacity .6s}
+.hbody{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;overflow:hidden}
+.ar{font-family:var(--ar);direction:rtl;text-align:center;color:var(--gold);line-height:1.6;padding:.1rem 0}
+.ar.l{font-size:2.2rem}.ar.m{font-size:1.6rem}.ar.s{font-size:1.25rem}
+.ms{text-align:center;font-size:.95rem;line-height:1.35;color:#fff}
+.sep{height:1px;background:rgba(255,255,255,.22);margin:.35rem 0}
+.aar{font-family:var(--ar);direction:rtl;text-align:center;font-size:1.3rem;line-height:1.5;color:var(--gold)}
+.ams{text-align:center;font-size:.8rem;color:var(--ink2)}
+
+/* Monitor */
+.mon{grid-column:3;grid-row:4;display:flex;flex-direction:column;height:100%;overflow:hidden}
+.mh{display:flex;justify-content:space-between;align-items:center;font-size:1rem;font-weight:600;margin-bottom:.35rem}
+.mg{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:.3rem 1.2rem}
+.m{min-width:0}
+.m .k{font-size:.75rem;color:var(--ink2)}
+.m .v{font-size:.98rem;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m .sub{font-size:.7rem;color:var(--ink2);white-space:nowrap}
+.bar{height:.28rem;border-radius:1rem;background:rgba(255,255,255,.2);margin-top:.2rem;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#fff;border-radius:1rem;transition:width 1s}
+
+/* ===== Tulisan: tebal gaya tulisan tangan ===== */
+.stage,.stage *{font-weight:700;letter-spacing:0}
+.stage{line-height:1.1;text-shadow:0 .08rem .3rem rgba(0,0,0,.35)}
+.time{font-size:5.6rem}.time small{font-size:2.2rem}
+.date{font-size:1.85rem}.hijri{font-size:1.4rem}
+.now .t{font-size:4rem}.now .ds{font-size:1.3rem}
+.chip{font-size:1.2rem}
+.day{font-size:1.15rem}.day .dn{font-size:1.3rem}.day .dr{font-size:1.05rem}
+.next .lbl{font-size:1.2rem}.next .nm{font-size:2.4rem}.next .cd{font-size:1.7rem}
+.row{font-size:1.4rem}.row b{font-size:1.75rem}
+.src,.live{font-size:1.05rem}
+.hl{font-size:1.15rem}
+.ms{font-size:1.15rem;line-height:1.2}.ams{font-size:1rem}
+.ar,.aar,.bis{text-shadow:0 0 .8rem rgba(255,226,160,.35),0 .08rem .25rem rgba(0,0,0,.45)}
+.bis{font-size:2.8rem}
+.ar.l{font-size:2.2rem}.ar.m{font-size:1.6rem}.ar.s{font-size:1.2rem}.aar{font-size:1.3rem}
+.mh{font-size:1.3rem}
+.m .k{font-size:1rem}.m .v{font-size:1.2rem}.m .sub{font-size:.9rem}
+.next{min-width:19rem}
+</style>
+</head>
+<body>
+<div class="bg">
+  <div class="sky s-dawn"></div><div class="sky s-day"></div><div class="sky s-dusk"></div><div class="sky s-night"></div>
+  <svg class="scene" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="sg"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".25" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+    <g id="stars" fill="#fff"><circle cx="683" cy="500" r="1.3"/><circle cx="828" cy="348" r="1.0"/><circle cx="168" cy="435" r="1.0"/><circle cx="768" cy="313" r="1.0"/><circle cx="1883" cy="274" r="1.3"/><circle cx="96" cy="59" r="2.2"/><circle cx="876" cy="50" r="1.3"/><circle cx="205" cy="297" r="2.2"/><circle cx="141" cy="438" r="1.0"/><circle cx="477" cy="337" r="1.0"/><circle cx="1201" cy="314" r="2.2"/><circle cx="121" cy="514" r="1.3"/><circle cx="115" cy="300" r="1.3"/><circle cx="613" cy="229" r="1.3"/><circle cx="1127" cy="75" r="1.7"/><circle cx="1167" cy="432" r="1.3"/><circle cx="231" cy="312" r="1.3"/><circle cx="782" cy="64" r="1.0"/><circle cx="1175" cy="45" r="1.3"/><circle cx="1036" cy="363" r="2.2"/><circle cx="1611" cy="175" r="2.2"/><circle cx="1219" cy="487" r="2.2"/><circle cx="760" cy="168" r="1.3"/><circle cx="1646" cy="107" r="1.3"/><circle cx="187" cy="309" r="1.7"/><circle cx="1095" cy="268" r="1.7"/><circle cx="1513" cy="244" r="1.7"/><circle cx="1267" cy="516" r="1.0"/><circle cx="261" cy="277" r="2.2"/><circle cx="357" cy="402" r="1.7"/><circle cx="331" cy="492" r="2.2"/><circle cx="883" cy="35" r="1.0"/><circle cx="1585" cy="300" r="1.7"/><circle cx="716" cy="370" r="1.7"/><circle cx="1237" cy="269" r="2.2"/><circle cx="160" cy="445" r="1.0"/><circle cx="572" cy="257" r="1.0"/><circle cx="144" cy="389" r="1.7"/><circle cx="1345" cy="310" r="2.2"/><circle cx="602" cy="381" r="2.2"/><circle cx="1836" cy="357" r="1.7"/><circle cx="66" cy="496" r="2.2"/><circle cx="747" cy="101" r="1.0"/><circle cx="1031" cy="45" r="1.3"/><circle cx="1593" cy="162" r="1.3"/><circle cx="1532" cy="141" r="2.2"/><circle cx="820" cy="484" r="2.2"/><circle cx="185" cy="100" r="2.2"/><circle cx="842" cy="296" r="1.7"/><circle cx="1829" cy="85" r="2.2"/><circle cx="1789" cy="296" r="1.7"/><circle cx="1466" cy="227" r="1.7"/><circle cx="1418" cy="467" r="2.2"/><circle cx="492" cy="92" r="1.0"/><circle cx="380" cy="92" r="1.3"/></g>
+    <g id="moon"><path d="M62 -10a50 50 0 1 0 0 100a40 40 0 1 1 0 -100z" fill="#f6efd2" transform="translate(-40 -40)"/></g>
+    <g id="sun"><circle r="230" fill="url(#sg)"/><circle r="52" class="sunc"/></g>
+    <g class="cl" transform="translate(300 250) scale(1.10)"><ellipse cx="0" cy="0" rx="90" ry="26"/><ellipse cx="-50" cy="-14" rx="52" ry="30"/><ellipse cx="25" cy="-24" rx="62" ry="34"/></g><g class="cl" transform="translate(950 360) scale(0.90)"><ellipse cx="0" cy="0" rx="90" ry="26"/><ellipse cx="-50" cy="-14" rx="52" ry="30"/><ellipse cx="25" cy="-24" rx="62" ry="34"/></g><g class="cl" transform="translate(1650 190) scale(1.20)"><ellipse cx="0" cy="0" rx="90" ry="26"/><ellipse cx="-50" cy="-14" rx="52" ry="30"/><ellipse cx="25" cy="-24" rx="62" ry="34"/></g>
+    <path class="m1" d="M0 770L170 650 330 730 520 570 720 710 900 630 1100 750 1300 610 1500 730 1700 650 1920 750V1080H0Z"/>
+    <path class="m2" d="M0 860C300 770 520 810 800 860S1300 800 1920 850V1080H0Z"/>
+    <g transform="translate(960 905) scale(.9)" class="mq">
+  <rect x="-170" y="-110" width="340" height="110"/>
+  <path d="M-90 -110A90 90 0 0 1 90 -110Z"/><rect x="-2" y="-230" width="4" height="40"/><circle cx="0" cy="-236" r="9"/>
+  <path d="M-170 -110A40 40 0 0 1 -90 -110Z"/><path d="M90 -110A40 40 0 0 1 170 -110Z"/>
+  <rect x="-240" y="-250" width="26" height="250"/><path d="M-244 -250H-210L-227 -300Z"/><rect x="-246" y="-195" width="38" height="9"/>
+  <rect x="214" y="-250" width="26" height="250"/><path d="M210 -250H244L227 -300Z"/><rect x="208" y="-195" width="38" height="9"/>
+</g>
+<g id="lit" fill="#ffd27a" transform="translate(960 905) scale(.9)"><rect x="-125" y="-78" width="14" height="40" rx="7"/><rect x="-83" y="-78" width="14" height="40" rx="7"/><rect x="-41" y="-78" width="14" height="40" rx="7"/><rect x="1" y="-78" width="14" height="40" rx="7"/><rect x="43" y="-78" width="14" height="40" rx="7"/><rect x="85" y="-78" width="14" height="40" rx="7"/><rect x="-233" y="-150" width="12" height="22" rx="6"/><rect x="221" y="-150" width="12" height="22" rx="6"/></g>
+    <path class="m3" d="M0 975C400 915 800 955 1200 940S1700 915 1920 945V1080H0Z"/>
+  </svg>
+</div>
+
+<main class="stage">
+  <div class="bis" lang="ar" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+
+  <section class="glass clock">
+    <div class="time"><span id="hm">--:--</span><small id="sec">00</small></div>
+    <div class="date" id="date">&nbsp;</div>
+    <div class="hijri" id="hijri">&nbsp;</div>
+  </section>
+
+  <section class="glass weather">
+    <div class="now">
+      <div class="ic" id="wIc">☁️</div>
+      <div class="t" id="wT">--°</div>
+      <div class="ds" id="wDs">Memuatkan cuaca</div>
+    </div>
+    <div class="right"><div class="chips" id="chips"></div><div class="days" id="days"></div></div>
+  </section>
+
+  <section class="glass prayer">
+    <div class="next">
+      <div class="lbl">Waktu solat seterusnya</div>
+      <div class="nm" id="nextName">…</div>
+      <div class="cd" id="nextCd">memuatkan</div>
+    </div>
+    <div class="rows" id="rows"></div>
+    <div class="src" id="psrc"></div>
+  </section>
+
+  <section class="glass hadith">
+    <div class="hl"><span id="hlab">Hadis Sahih</span><span id="hsrc"></span></div>
+    <div class="fade hbody" id="hb">
+      <div class="ar l" id="har" lang="ar" dir="rtl"></div>
+      <div class="ms" id="hms"></div>
+    </div>
+    <div class="sep"></div>
+    <div class="fade" id="ab">
+      <div class="aar" id="aar" lang="ar" dir="rtl"></div>
+      <div class="ams" id="ams"></div>
+    </div>
+  </section>
+
+  <section class="glass mon">
+    <div class="mh"><span>Monitor sistem TV</span><span class="live"><i></i>Langsung</span></div>
+    <div class="mg" id="mg"></div>
+  </section>
+</main>
+
+<script>
+/* ====== TETAPAN LOKASI ====== */
+var CFG = { city:'Melaka', lat:2.1896, lon:102.2501, tz:'Asia/Kuala_Lumpur', method:17 }; /* 17 = JAKIM */
+var HADITH = [["إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ", "Setiap amalan bergantung pada niat.", "Bukhari & Muslim"], ["الدِّينُ النَّصِيحَةُ", "Agama itu ialah nasihat.", "Muslim"], ["لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ", "Tidak sempurna iman seseorang sehingga dia mengasihi saudaranya sebagaimana dia mengasihi dirinya.", "Bukhari & Muslim"], ["الطُّهُورُ شَطْرُ الْإِيمَانِ", "Kebersihan itu separuh daripada iman.", "Muslim"], ["مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ", "Sesiapa beriman kepada Allah dan hari akhirat, hendaklah dia berkata baik atau diam.", "Bukhari & Muslim"], ["لَا تَغْضَبْ", "Janganlah engkau marah.", "Bukhari"], ["خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ", "Sebaik-baik kamu ialah yang mempelajari Al-Quran dan mengajarkannya.", "Bukhari"], ["وَالْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ", "Kata-kata yang baik itu sedekah.", "Bukhari & Muslim"], ["لَيْسَ الشَّدِيدُ بِالصُّرَعَةِ إِنَّمَا الشَّدِيدُ الَّذِي يَمْلِكُ نَفْسَهُ عِنْدَ الْغَضَبِ", "Orang kuat bukan yang pandai bergusti, tetapi yang dapat menahan dirinya ketika marah.", "Bukhari & Muslim"], ["الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ", "Muslim ialah orang yang umat Islam lain selamat daripada lidah dan tangannya.", "Bukhari & Muslim"], ["مَنْ لَا يَرْحَمْ لَا يُرْحَمْ", "Sesiapa yang tidak menyayangi, dia tidak akan disayangi.", "Bukhari & Muslim"], ["الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا", "Orang mukmin dengan mukmin lain seperti bangunan, saling menguatkan.", "Bukhari & Muslim"], ["مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ", "Sesiapa menempuh jalan mencari ilmu, Allah mudahkan baginya jalan ke syurga.", "Muslim"], ["الصَّلَاةُ نُورٌ وَالصَّدَقَةُ بُرْهَانٌ وَالصَّبْرُ ضِيَاءٌ", "Solat itu cahaya, sedekah itu bukti, dan sabar itu pelita.", "Muslim"], ["عَجَبًا لِأَمْرِ الْمُؤْمِنِ إِنَّ أَمْرَهُ كُلَّهُ خَيْرٌ", "Sungguh menakjubkan urusan orang mukmin, semua urusannya baik baginya.", "Muslim"], ["إِنَّ اللَّهَ لَا يَنْظُرُ إِلَى صُوَرِكُمْ وَأَمْوَالِكُمْ وَلَكِنْ يَنْظُرُ إِلَى قُلُوبِكُمْ وَأَعْمَالِكُمْ", "Allah tidak melihat rupa dan harta kamu, tetapi melihat hati dan amalan kamu.", "Muslim"], ["كُنْ فِي الدُّنْيَا كَأَنَّكَ غَرِيبٌ أَوْ عَابِرُ سَبِيلٍ", "Jadilah di dunia ini seolah-olah orang asing atau musafir.", "Bukhari"], ["نِعْمَتَانِ مَغْبُونٌ فِيهِمَا كَثِيرٌ مِنَ النَّاسِ الصِّحَّةُ وَالْفَرَاغُ", "Dua nikmat yang banyak manusia rugi padanya: kesihatan dan masa lapang.", "Bukhari"], ["مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ", "Sesiapa berpuasa Ramadan dengan iman dan mengharap pahala, diampunkan dosanya yang lalu.", "Bukhari & Muslim"], ["مَنْ دَلَّ عَلَى خَيْرٍ فَلَهُ مِثْلُ أَجْرِ فَاعِلِهِ", "Sesiapa menunjukkan kepada kebaikan, dia mendapat pahala seperti pelakunya.", "Muslim"], ["أَحَبُّ الْأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ", "Amalan yang paling dicintai Allah ialah yang berterusan walaupun sedikit.", "Bukhari & Muslim"], ["الْيَدُ الْعُلْيَا خَيْرٌ مِنَ الْيَدِ السُّفْلَى", "Tangan yang memberi lebih baik daripada tangan yang menerima.", "Bukhari & Muslim"], ["مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيُكْرِمْ ضَيْفَهُ", "Sesiapa beriman kepada Allah dan hari akhirat, hendaklah dia memuliakan tetamunya.", "Bukhari & Muslim"], ["مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلَا يُؤْذِ جَارَهُ", "Sesiapa beriman kepada Allah dan hari akhirat, janganlah dia menyakiti jirannya.", "Bukhari & Muslim"], ["إِنَّ مِنْ خِيَارِكُمْ أَحْسَنَكُمْ أَخْلَاقًا", "Sesungguhnya antara yang terbaik dalam kalangan kamu ialah yang paling baik akhlaknya.", "Bukhari & Muslim"], ["مَنْ يُرِدِ اللَّهُ بِهِ خَيْرًا يُفَقِّهْهُ فِي الدِّينِ", "Sesiapa yang Allah kehendaki kebaikan baginya, Dia memberinya kefahaman dalam agama.", "Bukhari & Muslim"], ["كَلِمَتَانِ خَفِيفَتَانِ عَلَى اللِّسَانِ ثَقِيلَتَانِ فِي الْمِيزَانِ حَبِيبَتَانِ إِلَى الرَّحْمَنِ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ سُبْحَانَ اللَّهِ الْعَظِيمِ", "Dua kalimah ringan di lidah, berat di timbangan, dicintai Ar-Rahman: Subhanallah wa bihamdih, Subhanallahil 'Azim.", "Bukhari & Muslim"], ["إِنَّ اللَّهَ كَتَبَ الْإِحْسَانَ عَلَى كُلِّ شَيْءٍ", "Sesungguhnya Allah mewajibkan berbuat ihsan terhadap segala sesuatu.", "Muslim"], ["الْمُؤْمِنُ الْقَوِيُّ خَيْرٌ وَأَحَبُّ إِلَى اللَّهِ مِنَ الْمُؤْمِنِ الضَّعِيفِ", "Mukmin yang kuat lebih baik dan lebih dicintai Allah daripada mukmin yang lemah.", "Muslim"], ["إِنَّ اللَّهَ طَيِّبٌ لَا يَقْبَلُ إِلَّا طَيِّبًا", "Sesungguhnya Allah itu baik, Dia tidak menerima melainkan yang baik.", "Muslim"]];
+var AYAT = [["فَإِنَّ مَعَ الْعُسْرِ يُسْرًا", "Sesungguhnya bersama kesulitan ada kemudahan.", "Asy-Syarh 94:5"], ["أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ", "Ketahuilah, dengan mengingati Allah hati menjadi tenang.", "Ar-Ra'd 13:28"], ["وَمَنْ يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ", "Sesiapa bertawakal kepada Allah, Dia mencukupkannya.", "At-Talaq 65:3"], ["إِنَّ اللَّهَ مَعَ الصَّابِرِينَ", "Sesungguhnya Allah bersama orang yang sabar.", "Al-Baqarah 2:153"], ["فَاذْكُرُونِي أَذْكُرْكُمْ", "Ingatlah kepada-Ku, nescaya Aku mengingati kamu.", "Al-Baqarah 2:152"], ["رَبِّ زِدْنِي عِلْمًا", "Wahai Tuhanku, tambahkanlah ilmu kepadaku.", "Taha 20:114"], ["وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ", "Dan kelak Tuhanmu akan memberimu sehingga engkau reda.", "Ad-Duha 93:5"], ["حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ", "Cukuplah Allah bagi kami, dan Dia sebaik-baik pelindung.", "Ali Imran 3:173"], ["لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", "Tiada daya dan kekuatan melainkan dengan pertolongan Allah.", "Zikir"], ["سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", "Maha Suci Allah dan dengan memuji-Nya.", "Zikir"]];
+
+var $ = function(id){ return document.getElementById(id); };
+var pad = function(n){ return (n<10?'0':'')+n; };
+var hm = function(d){ return pad(d.getHours())+':'+pad(d.getMinutes()); };
+var store = {
+  get:function(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set:function(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+
+/* ---------- Jam & tarikh ---------- */
+var DAYS=['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+var MON=['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+function tickClock(){
+  var d=new Date(), h=d.getHours();
+  $('hm').textContent=pad(h%12||12)+':'+pad(d.getMinutes());
+  $('sec').textContent=pad(d.getSeconds())+(h<12?' PG':' PTG');
+  $('date').textContent=DAYS[d.getDay()]+', '+d.getDate()+' '+MON[d.getMonth()]+' '+d.getFullYear();
+  updatePhase(d); updateNext(d);
+}
+
+/* ---------- Pagi / siang / petang / malam (auto) ---------- */
+var sun={rise:7,set:19};
+function updatePhase(d){
+  var t=d.getHours()+d.getMinutes()/60, p;
+  if(t>=sun.rise-.7 && t<sun.rise+2.5) p='dawn';
+  else if(t>=sun.rise+2.5 && t<sun.set-2) p='day';
+  else if(t>=sun.set-2 && t<sun.set+.7) p='dusk';
+  else p='night';
+  if(document.body.getAttribute('data-phase')!==p) document.body.setAttribute('data-phase',p);
+}
+function hrs(iso){ var m=/T(\d\d):(\d\d)/.exec(iso||''); return m? (+m[1])+(+m[2])/60 : null; }
+
+/* ---------- Waktu solat (Aladhan, kaedah JAKIM) ---------- */
+var P=null, NAMES=[['Fajr','Subuh'],['Sunrise','Syuruk'],['Dhuhr','Zohor'],['Asr','Asar'],['Maghrib','Maghrib'],['Isha','Isyak']];
+function dkey(d){ return pad(d.getDate())+'-'+pad(d.getMonth()+1)+'-'+d.getFullYear(); }
+function loadPrayer(){
+  var d=new Date(), k=dkey(d), c=store.get('prayer');
+  if(c && c.key===k){ P=c; renderPrayer(); }
+  fetch('https://api.aladhan.com/v1/timings/'+k+'?latitude='+CFG.lat+'&longitude='+CFG.lon+'&method='+CFG.method)
+    .then(function(r){return r.json();})
+    .then(function(j){
+      var t=j.data.timings, o={at:hm(new Date()),key:k,times:{},hijri:j.data.date.hijri.day+' '+j.data.date.hijri.month.en+' '+j.data.date.hijri.year+' H'};
+      NAMES.forEach(function(n){ o.times[n[0]]=String(t[n[0]]).slice(0,5); });
+      P=o; store.set('prayer',o); renderPrayer();
+    }).catch(function(){
+      if(!P) $('nextCd').textContent='Tiada internet';
+      else { $('psrc').className='live off src'; $('psrc').innerHTML='<i></i>Offline · guna data tersimpan '+P.at; }
+    });
+}
+function pdate(s,base){ var a=s.split(':'), x=new Date(base); x.setHours(+a[0],+a[1],0,0); return x; }
+function fmt12(s){ var a=s.split(':'), h=+a[0]; return pad(h%12||12)+':'+a[1]+(h<12?' pg':' ptg'); }
+function renderPrayer(){
+  if(!P) return;
+  $('hijri').textContent=P.hijri;
+  $('rows').innerHTML=NAMES.map(function(n){
+    return '<div class="row" data-k="'+n[0]+'"><span>'+n[1]+'</span><b>'+fmt12(P.times[n[0]])+'</b></div>';
+  }).join('');
+  $('psrc').className='live src';
+  $('psrc').innerHTML='<i></i>Langsung · JAKIM · '+CFG.city+' · '+P.at;
+  updateNext(new Date());
+}
+function updateNext(now){
+  if(!P) return;
+  var next=null, i, t;
+  for(i=0;i<NAMES.length;i++){ t=pdate(P.times[NAMES[i][0]],now); if(t>now){ next=[NAMES[i],t]; break; } }
+  if(!next){ var tm=new Date(now); tm.setDate(tm.getDate()+1); next=[NAMES[0],pdate(P.times.Fajr,tm)]; }
+  var s=Math.max(0,Math.floor((next[1]-now)/1000));
+  $('nextName').textContent=next[0][1]+'  '+fmt12(P.times[next[0][0]]);
+  $('nextCd').textContent='dalam '+pad(Math.floor(s/3600))+':'+pad(Math.floor(s%3600/60))+':'+pad(s%60);
+  var rows=document.querySelectorAll('.row');
+  for(i=0;i<rows.length;i++){
+    var k=rows[i].getAttribute('data-k'), pt=pdate(P.times[k],now);
+    var cls='row'+(k===next[0][0]?' on':'')+(pt<=now?' past':'');
+    if(rows[i].className!==cls) rows[i].className=cls;
+  }
+  if(now.getHours()===0 && now.getMinutes()===1 && now.getSeconds()<2) loadPrayer();
+}
+
+/* ---------- Cuaca (Open-Meteo) ---------- */
+var lastW='--:--';
+var WC={0:['☀️','Cerah'],1:['🌤️','Kebanyakan cerah'],2:['⛅','Separa mendung'],3:['☁️','Mendung'],45:['🌫️','Berkabus'],48:['🌫️','Berkabus'],
+51:['🌦️','Gerimis'],53:['🌦️','Gerimis'],55:['🌧️','Gerimis lebat'],61:['🌧️','Hujan ringan'],63:['🌧️','Hujan'],65:['🌧️','Hujan lebat'],
+80:['🌦️','Hujan sekejap'],81:['🌧️','Hujan sekejap'],82:['⛈️','Hujan lebat'],95:['⛈️','Ribut petir'],96:['⛈️','Ribut petir'],99:['⛈️','Ribut petir']};
+function wc(c){ return WC[c]||['🌡️','—']; }
+function loadWeather(){
+  var u='https://api.open-meteo.com/v1/forecast?latitude='+CFG.lat+'&longitude='+CFG.lon+
+    '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m'+
+    '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset'+
+    '&timezone='+encodeURIComponent(CFG.tz)+'&forecast_days=5';
+  fetch(u).then(function(r){return r.json();}).then(function(j){
+    var c=j.current, d=j.daily, w=wc(c.weather_code);
+    sun.rise=hrs(d.sunrise[0])||7; sun.set=hrs(d.sunset[0])||19; updatePhase(new Date());
+    lastW=hm(new Date());
+    $('wIc').textContent=w[0]; $('wT').textContent=Math.round(c.temperature_2m)+'°';
+    $('wDs').innerHTML=w[1]+' · '+CFG.city+'<br><span class="live"><i></i>Langsung '+lastW+'</span>';
+    $('chips').innerHTML=
+      '<div class="chip"><span>Terasa </span>'+Math.round(c.apparent_temperature)+'°</div>'+
+      '<div class="chip"><span>Lembap </span>'+c.relative_humidity_2m+'%</div>'+
+      '<div class="chip"><span>Angin </span>'+Math.round(c.wind_speed_10m)+' km/j</div>'+
+      '<div class="chip"><span>Hujan </span>'+d.precipitation_probability_max[0]+'%</div>'+
+      '<div class="chip"><span>UV </span>'+Math.round(d.uv_index_max[0])+'</div>'+
+      '<div class="chip"><span>Matahari </span>'+d.sunrise[0].slice(11)+' / '+d.sunset[0].slice(11)+'</div>';
+    var h='';
+    for(var i=0;i<5;i++){
+      var dt=new Date(d.time[i]+'T12:00:00'), x=wc(d.weather_code[i]);
+      h+='<div class="day"><div class="dn">'+(i===0?'Hari ini':DAYS[dt.getDay()].slice(0,3))+'</div><div class="di">'+x[0]+'</div>'+
+        '<div>'+Math.round(d.temperature_2m_max[i])+'° <span class="dr">'+Math.round(d.temperature_2m_min[i])+'°</span></div>'+
+        '<div class="dr">💧'+d.precipitation_probability_max[i]+'%</div></div>';
+    }
+    $('days').innerHTML=h;
+  }).catch(function(){
+    if(!$('chips').innerHTML) $('wDs').textContent='Cuaca: tiada internet';
+    else $('wDs').innerHTML+='<br><span class="live off"><i></i>Gagal kemas kini</span>';
+  });
+}
+
+/* ---------- Hadis sahih (30) & ayat / zikir ---------- */
+var hi=new Date().getDate()%HADITH.length, ai=new Date().getDate()%AYAT.length;
+function fitHadith(){
+  var hb=$('hb'), ar=$('har'), ms=$('hms'), n=0;
+  ar.style.fontSize=''; ms.style.fontSize='';
+  var a=parseFloat(getComputedStyle(ar).fontSize), m=parseFloat(getComputedStyle(ms).fontSize);
+  while(hb.scrollHeight>hb.clientHeight+1 && n<60){
+    if(a>16){ a-=1; ar.style.fontSize=a+'px'; } else if(m>12){ m-=1; ms.style.fontSize=m+'px'; } else break; n++;
+  }
+}
+function showHadith(first){
+  var h=HADITH[hi], n=h[0].length, el=$('har');
+  function set(){
+    el.textContent=h[0]; el.className='ar '+(n<=45?'l':n<=95?'m':'s');
+    $('hms').textContent=h[1]; $('hsrc').textContent='HR '+h[2];
+    $('hlab').textContent='Hadis Sahih '+(hi+1)+' / '+HADITH.length;
+    $('hb').style.opacity=1; fitHadith();
+  }
+  if(first){ set(); } else { $('hb').style.opacity=0; setTimeout(set,650); }
+  hi=(hi+1)%HADITH.length;
+}
+function showAyat(first){
+  var a=AYAT[ai];
+  function set(){ $('aar').textContent=a[0]; $('ams').textContent=a[1]+' ('+a[2]+')'; $('ab').style.opacity=1; }
+  if(first){ set(); } else { $('ab').style.opacity=0; setTimeout(set,650); }
+  ai=(ai+1)%AYAT.length;
+}
+
+/* ---------- Monitor sistem (bacaan sebenar daripada pelayar TV) ---------- */
+var fps=0, frames=0, last=performance.now(), t0=Date.now(), sto={u:0,q:0};
+(function loop(){ frames++; var n=performance.now(); if(n-last>=1000){ fps=Math.round(frames*1000/(n-last)); frames=0; last=n; } requestAnimationFrame(loop); })();
+var CELLS=[['fps','Prestasi paparan',1],['mem','Memori halaman',1],['cpu','CPU / RAM TV',0],['net','Rangkaian',1],
+           ['sto','Storan pelayar',1],['scr','Skrin',0],['sys','Pelayar & Android',0],['up','Masa jalan',0]];
+var cellEl={};
+(function(){
+  var h='';
+  CELLS.forEach(function(c){ h+='<div class="m"><div class="k">'+c[1]+'</div><div class="v" id="v_'+c[0]+'">-</div>'+
+    (c[2]?'<div class="bar"><i id="b_'+c[0]+'"></i></div>':'<div class="sub" id="s_'+c[0]+'">&nbsp;</div>')+'</div>'; });
+  $('mg').innerHTML=h;
+})();
+function setC(id,v,pct,sub){ $('v_'+id).textContent=v; if(pct!=null){ $('b_'+id).style.width=Math.max(0,Math.min(100,pct))+'%'; } if(sub!=null && $('s_'+id)) $('s_'+id).textContent=sub; }
+function mb(x){ return Math.round(x/1048576); }
+function readStorage(){ try{ if(navigator.storage&&navigator.storage.estimate) navigator.storage.estimate().then(function(e){ sto.u=e.usage||0; sto.q=e.quota||0; }); }catch(e){} }
+function updateMon(){
+  var nav=navigator, pm=performance.memory, con=nav.connection||{}, ua=nav.userAgent||'';
+  setC('fps',fps+' FPS',fps/60*100);
+  if(pm) setC('mem',mb(pm.usedJSHeapSize)+' / '+mb(pm.jsHeapSizeLimit)+' MB',pm.usedJSHeapSize/pm.jsHeapSizeLimit*100); else setC('mem','tidak disokong',0);
+  setC('cpu',(nav.hardwareConcurrency||'?')+' teras · ~'+(nav.deviceMemory||'?')+' GB RAM',null,'RAM: anggaran');
+  if(nav.onLine) setC('net',(con.effectiveType||'online').toUpperCase()+(con.downlink?' · '+con.downlink+' Mbps':'')+(con.rtt?' · '+con.rtt+' ms':''),con.downlink?con.downlink/50*100:50);
+  else setC('net','Offline',0);
+  setC('sto',sto.q?mb(sto.u)+' / '+mb(sto.q)+' MB':'tidak disokong',sto.q?Math.max(1,sto.u/sto.q*100):0);
+  setC('scr',window.innerWidth+'×'+window.innerHeight,null,'DPR '+(window.devicePixelRatio||1)+'x');
+  var c=/Chrome\/(\d+)/.exec(ua), a=/Android[ ]?([\d.]+)/.exec(ua);
+  setC('sys',(c?'Chrome '+c[1]:'Pelayar')+' · '+(a?'Android '+a[1]:'TV'),null,'Pelayar skrin ini');
+  var m=Math.floor((Date.now()-t0)/60000);
+  setC('up',Math.floor(m/60)+'j '+(m%60)+'m',null,'Cuaca '+lastW+' · Solat '+(P?P.at:'--:--'));
+}
+
+/* ---------- Kekal hidup & mula ---------- */
+try{ if(navigator.wakeLock) navigator.wakeLock.request('screen').catch(function(){}); }catch(e){}
+document.addEventListener('visibilitychange',function(){ try{ if(!document.hidden&&navigator.wakeLock) navigator.wakeLock.request('screen').catch(function(){}); }catch(e){} });
+
+showHadith(true); showAyat(true);
+try{ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitHadith); }catch(e){}
+tickClock(); loadPrayer(); loadWeather(); readStorage(); updateMon();
+setInterval(tickClock,1000);
+setInterval(updateMon,4000);
+setInterval(readStorage,30000);
+setInterval(loadWeather,15*60*1000);
+setInterval(loadPrayer,60*60*1000);
+setInterval(function(){ showHadith(false); },30000);
+setInterval(function(){ showAyat(false); },45000);
+</script>
+</body>
+</html>
